@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محول يوتيوب - تحميل الصوت والفيديو</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px;
+            width: 80%;
+            max-width: 400px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>محول يوتيوب - تحميل الفيديو والصوت</h1>
+    <p>أدخل رابط يوتيوب لتحويله إلى فيديو أو صوت:</p>
+    
+    <input type="text" id="url" placeholder="أدخل رابط يوتيوب هنا">
+    <br>
+    <button onclick="convert()">تحويل</button>
+
+    <div id="result"></div>
+
+    <script>
+        function convert() {
+            const url = document.getElementById('url').value;
+            if (url) {
+                // تنفيذ طلب التحويل
+                fetch(`/convert?url=${encodeURIComponent(url)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let resultHtml = `<h3>تم التحويل بنجاح!</h3>`;
+                        resultHtml += `<p><a href="${data.videoUrl}" target="_blank">تحميل الفيديو</a></p>`;
+                        resultHtml += `<p><a href="${data.audioUrl}" target="_blank">تحميل الصوت</a></p>`;
+                        document.getElementById('result').innerHTML = resultHtml;
+                    })
+                    .catch(error => {
+                        document.getElementById('result').innerHTML = `<p>حدث خطأ أثناء التحويل. حاول مرة أخرى.</p>`;
+                    });
+            } else {
+                alert('يرجى إدخال رابط يوتيوب!');
+            }
+        }
+    </script>
+</body>
+</html>

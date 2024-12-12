@@ -1,24 +1,13 @@
 {
-  "name": "convert",
+  "name": "youtube-downloader",
   "version": "1.0.0",
-  "main": "Apps.js",
+  "description": "YouTube downloader app",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/AnanEgypt/youtube-downloader.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/AnanEgypt/youtube-downloader/issues"
-  },
-  "homepage": "https://github.com/AnanEgypt/youtube-downloader#readme",
-  "description": "",
   "dependencies": {
-    "express": "^4.21.2",
-    "ytdl-core": "^4.11.5"
+    "express": "^4.17.1",
+    "fluent-ffmpeg": "^2.1.2"
   }
 }
