@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const ytdl = require('ytdl-core');
 const ffmpeg = require('fluent-ffmpeg');
+const fs = require('fs');
 const app = express();
 
 // تحديد مجلد public
@@ -24,36 +25,48 @@ app.get('/convert', async (req, res) => {
     try {
         const videoInfo = await ytdl.getInfo(videoUrl);
 
-        // إعداد مسارات التحميل
-        const videoPath = `downloads/${videoInfo.videoDetails.title}-video.mp4`;
-        const audioPath = `downloads/${videoInfo.videoDetails.title}-audio.mp3`;
-
-        // تحميل الفيديو
-        ffmpeg(ytdl(videoUrl, { quality: 'highestvideo' }))
-            .save(videoPath)
-            .on('end', () => {
-                console.log('تم حفظ الفيديو');
-            });
-
-        // تحميل الصوت
-        ffmpeg(ytdl(videoUrl, { quality: 'highestaudio' }))
-            .save(audioPath)
-            .on('end', () => {
-                console.log('تم حفظ الصوت');
-            });
-
-        // إرسال روابط الملفات إلى الواجهة
+        // إرسال روابط الفيديو والصوت إلى الواجهة
         res.json({
-            videoUrl: `http://localhost:3000/${videoPath}`,
-            audioUrl: `http://localhost:3000/${audioPath}`,
+            videoUrl: `/download-video?url=${encodeURIComponent(videoUrl)}`,
+            audioUrl: `/download-audio?url=${encodeURIComponent(videoUrl)}`,
         });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'حدث خطأ أثناء التحويل' });
     }
 });
 
+// نقطة النهاية لتحميل الفيديو
+app.get('/download-video', (req, res) => {
+    const videoUrl = req.query.url;
+
+    // تحقق من صحة الرابط
+    if (!videoUrl || !ytdl.validateURL(videoUrl)) {
+        return res.status(400).json({ error: 'رابط يوتيوب غير صالح' });
+    }
+
+    const videoStream = ytdl(videoUrl, { quality: 'highestvideo' });
+    res.setHeader('Content-Type', 'video/mp4');
+    videoStream.pipe(res);
+});
+
+// نقطة النهاية لتحميل الصوت
+app.get('/download-audio', (req, res) => {
+    const audioUrl = req.query.url;
+
+    // تحقق من صحة الرابط
+    if (!audioUrl || !ytdl.validateURL(audioUrl)) {
+        return res.status(400).json({ error: 'رابط يوتيوب غير صالح' });
+    }
+
+    const audioStream = ytdl(audioUrl, { quality: 'highestaudio' });
+    res.setHeader('Content-Type', 'audio/mp3');
+    audioStream.pipe(res);
+});
+
 // إعداد الخادم على المنفذ 3000
 app.listen(3000, () => {
     console.log('Server running at http://localhost:3000');
 });
+لهف
